@@ -1,0 +1,41 @@
+List of activities
+
+MainEntryActivity
+ ACTION_MAIN/CATEGORY_LAUNCHER
+ Main menu for the application
+  Import new ticket list -> TicketListImporter -> ScanCentralActivity
+  Select ticket list -> TicketListSelector -> ScanCentralActivity
+  Settings link?
+
+ListSelectorActivity
+ ACTION_PICK/CATEGORY_DEFAULT
+ ACTION_VIEW, ACTION_EDIT
+  type vnd.android.cursor.dir/net.madhouse.tixscan.list
+ Show existing lists
+ Return type vnd.android.cursor.item/net.madhouse.tixscan.list
+
+ListImporterActivity
+ ACTION_INSERT/CATEGORY_DEFAULT
+  type vnd.android.cursor.dir/net.madhouse.tixscan.list
+ Take address of CSV file online?
+ Add list to database
+ Return type vnd.android.cursor.item/net.madhouse.tixscan.list
+
+ScanCentralActivity
+ ACTION_VIEW/CATEGORY_DEFAULT
+ ACTION_EDIT
+  type vnd.android.cursor.item/net.madhouse.tixscan.list
+ Show basic stats
+  Tickets in list
+  Tickets used/unused
+ Show most recent ticket scanned
+  Accept, reject
+ Large scan button
+  Calls out to ZXing
+
+SettingsActivity
+ ACTION_MAIN
+ Default action on duplicates
+  Accept or reject
+
+AboutActivity

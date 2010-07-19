@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="net.madhouse.tixscan"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <activity android:name=".MainEntryActivity"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity android:name=".ListSelectorActivity"
+				android:label="Choose a ticket list">
+        	<intent-filter>
+        		<action android:name="android.intent.action.PICK" />
+        		<action android:name="android.intent.action.VIEW" />
+        		<action android:name="android.intent.action.EDIT" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:mimeType="vnd.android.cursor.dir/net.madhouse.tixscan.list" />
+        	</intent-filter>
+		</activity>
+		
+		<activity android:name=".ListImporterActivity"
+				android:label="Import a new ticket list">
+			<intent-filter>
+				<action android:name="android.intent.action.INSERT" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="vnd.android.cursor.dir/net.madhouse.tixscan.list" />
+			</intent-filter>
+		</activity>
+		
+		<activity android:name=".ScanCentralActivity"
+				android:label="Scanning Tickets">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<action android:name="android.intent.action.EDIT" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="vnd.android.cursor.item/net.madhouse.tixscan.list" />
+			</intent-filter>
+		</activity>
+		
+		<activity android:name=".SettingsActivity"
+				android:label="Ticket Scanner Settings" />
+		<activity android:name=".AboutActivity"
+				android:label="About Ticket Scanner" />
+
+    </application>
+    <uses-sdk android:minSdkVersion="3" />
+
+</manifest> 
