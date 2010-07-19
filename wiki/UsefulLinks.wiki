@@ -1,0 +1,4 @@
+#summary Links to things that will help.
+
+http://developer.android.com/reference/
+http://code.google.com/p/zxing/wiki/ScanningViaIntent
