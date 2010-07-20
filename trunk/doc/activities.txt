@@ -1,16 +1,11 @@
 List of activities
 
-MainEntryActivity
- ACTION_MAIN/CATEGORY_LAUNCHER
- Main menu for the application
-  Import new ticket list -> TicketListImporter -> ScanCentralActivity
-  Select ticket list -> TicketListSelector -> ScanCentralActivity
-  Settings link?
-
 ListSelectorActivity
+ ACTION_MAIN/CATEGORY_LAUNCHER
  ACTION_PICK/CATEGORY_DEFAULT
- ACTION_VIEW, ACTION_EDIT
+  ACTION_VIEW, ACTION_EDIT
   type vnd.android.cursor.dir/net.madhouse.tixscan.list
+ First choice: import new list -> ListImporterActivity -> ScanCentralActivity
  Show existing lists
  Return type vnd.android.cursor.item/net.madhouse.tixscan.list
 
@@ -32,10 +27,12 @@ ScanCentralActivity
   Accept, reject
  Large scan button
   Calls out to ZXing
-
-SettingsActivity
- ACTION_MAIN
- Default action on duplicates
-  Accept or reject
+ Menu button:
+  Default behavior for duplicate tickets
+   Reject (default) or accept
+  Email ticket list
+  Clear list data
+   Confirm
+   Cancel
 
 AboutActivity
