@@ -17,6 +17,7 @@ package net.madhouse.tixscan;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Menu;
 
 public class ScanCentralActivity extends Activity {
     /** Called when the activity is first created. */
@@ -26,4 +27,12 @@ public class ScanCentralActivity extends Activity {
         setContentView(R.layout.scan_central);
     }
 
+    /* (non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.scanner_options, menu);
+		return true;
+	}
 }
