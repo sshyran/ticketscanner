@@ -1,0 +1,9 @@
+The database design for this app doesn't need to be very complicated.  Each
+list of tickets will be its own table, referenced by name. Columns will be:
+
+_id INTEGER PRIMARY KEY
+text TEXT
+first_scan INTEGER (Java gives times as long, no need to translate to DATETIME)
+scan_count INTEGER
+
+These columns are stored in Constants.TicketTable.
