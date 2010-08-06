@@ -16,14 +16,120 @@
 package net.madhouse.tixscan;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
-public class ListImporterActivity extends Activity {
+public class ListImporterActivity extends Activity implements View.OnClickListener {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(android.R.style.Theme_Dialog);
         setContentView(R.layout.list_importer);
+        
+        Button btn = (Button) findViewById(R.id.import_btn_ok);
+        btn.setOnClickListener(this);
+        
+        btn = (Button) findViewById(R.id.import_btn_cancel);
+        btn.setOnClickListener(this);
+        
+        btn = (Button) findViewById(R.id.import_dbg);
+        btn.setOnClickListener(this);
     }
 
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.import_btn_ok:
+			new Thread(new Downloader()).start();
+			break;
+		case R.id.import_btn_cancel:
+			setResult(RESULT_CANCELED);
+			finish();
+			break;
+		case R.id.import_dbg:
+			new Thread(new Mischief()).start();
+			break;
+		}
+	}
+
+	private class Downloader implements Runnable {
+		public Downloader() {
+			// do nothing
+		}
+
+		@Override
+		public void run() {
+			// TODO todo oh gods todo
+			
+		}	
+	}
+	
+	private class Mischief implements Runnable {
+		public Mischief() {
+			// do nothing
+		}
+
+		@Override
+		public void run() {
+			String[] titles = {
+					"Ravens in the Library",
+					"Cheshire Kitten (We're all mad here)",
+					"Were-owl",
+					"Love Lies",
+					"Don't Get My Hopes Up",
+					"Neptune",
+					"Girl with the Lion's Tail (Lucia)",
+					"September's Rhyme",
+					"The Truth about Ninjas",
+					"Salad of Doom",
+					"Witchka",
+					"To My Valentine"
+			};
+			TextView nameentry = (TextView)findViewById(R.id.import_edit_name);
+			String name = nameentry.getText().toString();
+			DatabaseHelper helper = new DatabaseHelper(ListImporterActivity.this);
+			
+			setProgress(R.string.updating_db, true);
+			int result = helper.createTable(name, titles);
+			
+			switch (result) {
+			case DatabaseHelper.RESULT_OK:
+				// TODO: Does this need to be on the UI thread?
+				Uri.Builder builder = new Uri.Builder();
+				builder.path(name);
+				Intent ret = new Intent();
+				ret.setDataAndType(builder.build(), Constants.MIME_TYPE_ITEM);
+				setResult(RESULT_OK, ret);
+				finish();
+				break;
+			case DatabaseHelper.RESULT_LIST_EXISTS:
+				setProgress(R.string.fail_list_exists, false);
+				break;
+			case DatabaseHelper.RESULT_BAD_LIST_NAME:
+				setProgress(R.string.fail_bad_list_name, false);
+				break;
+			case DatabaseHelper.RESULT_SQL_FAIL:
+				setProgress(R.string.fail_sql_error);
+				break;
+			}
+		}
+	}
+	
+	void setProgress(final int message, final boolean stillRunning) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				findViewById(R.id.import_progress).setVisibility(stillRunning? View.VISIBLE: View.GONE);
+				TextView proglabel = (TextView)findViewById(R.id.import_progress_label);
+				proglabel.setVisibility(View.VISIBLE);
+				proglabel.setText(message);
+			}
+		});
+		
+	}
 }

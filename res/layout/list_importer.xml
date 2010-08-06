@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 
-   Copyright 2010 Brian C. Young and contributors
-   
-   Licensed under the Apache License, Version 2.0 (the "License"); you may 
-   not use this file except in compliance with the License. You may obtain a 
-   copy of the License at 
-   
-       http://www.apache.org/licenses/LICENSE-2.0 
-   
-   Unless required by applicable law or agreed to in writing, software 
-   distributed under the License is distributed on an "AS IS" BASIS, 
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-   See the License for the specific language governing permissions and 
-   limitations under the License. 
-      -->
+<!-- Copyright 2010 Brian C. Young and contributors Licensed under the Apache 
+	License, Version 2.0 (the "License"); you may not use this file except in 
+	compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+	android:orientation="vertical" android:padding="3pt" android:layout_height="wrap_content" android:layout_width="fill_parent">
+	<TextView android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:text="@string/url_label" />
+	<EditText android:layout_height="wrap_content" android:id="@+id/import_edit_url"
+		android:layout_width="fill_parent" android:hint="@string/url_hint"></EditText>
+	<TextView android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:text="@string/name_label" />
+	<EditText android:layout_height="wrap_content" android:id="@+id/import_edit_name"
+		android:layout_width="fill_parent" android:hint="@string/name_hint"></EditText>
+
+	<LinearLayout android:layout_height="wrap_content"
+		android:orientation="horizontal" android:layout_width="fill_parent"
+		android:layout_margin="3pt">
+		<Button android:layout_height="wrap_content" android:id="@+id/import_btn_ok"
+			android:text="@string/ok" android:layout_width="fill_parent" android:layout_weight="1"></Button>
+		<Button android:layout_height="wrap_content" android:id="@+id/import_btn_cancel"
+			android:text="@string/cancel" android:layout_width="fill_parent" android:layout_weight="1"></Button>
+	</LinearLayout>
+<LinearLayout android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginLeft="12pt" android:layout_marginRight="12pt" android:layout_width="fill_parent"><ProgressBar android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/import_progress" android:visibility="invisible"></ProgressBar>
+<TextView android:gravity="center_vertical" android:id="@+id/import_progress_label" android:hint="(Seeing this is a bug)" android:layout_height="fill_parent" android:layout_width="fill_parent" android:visibility="invisible"></TextView>
+</LinearLayout><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/import_dbg" android:text="DEBUG: make Mischief" android:layout_gravity="center"></Button>
+
+
 </LinearLayout>
