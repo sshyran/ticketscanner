@@ -14,18 +14,6 @@
    limitations under the License. 
       -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:title="Default Duplicate Behavior" android:id="@+id/menuitem_dupe_default">
-		<menu>
-			<group android:checkableBehavior="single">
-				<item android:id="@+id/menuitem_dupe_default_reject"
-					android:title="Reject ticket" android:checkable="true"
-					android:checked="true"></item>
-				<item android:id="@+id/menuitem_dupe_default_accept"
-					android:title="Accept ticket" android:checkable="true"
-					android:checked="false"></item>
-			</group>
-		</menu>
-	</item>
 	<item android:title="Email List Status" android:id="@+id/menuitem_email"></item>
 	<item android:title="Clear List" android:id="@+id/menuitem_clear">
 		<menu>
@@ -33,5 +21,4 @@
 			<item android:title="Cancel"></item>
 		</menu>
 	</item>
-	<item android:title="About" android:id="@+id/menuitem_about"></item>
 </menu>

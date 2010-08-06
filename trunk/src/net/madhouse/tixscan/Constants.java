@@ -15,19 +15,18 @@
  */
 package net.madhouse.tixscan;
 
-import android.provider.BaseColumns;
 
 public final class Constants {
 	public static final String PREFS_FILE = "TixScanPrefs";
-	public static final String PREF_ACCEPT_BY_DEFAULT = "AcceptByDefault";
 	
-	public static final class TicketTable implements BaseColumns {
-		public static final String TEXT = "text";
-		public static final String FIRST_SCAN = "first_scan";
-		public static final String SCAN_COUNT = "scan_count";
-		
-		private TicketTable() {}
-	}
+	public static final String PREF_DUPLICATE_BEHAVIOUR = "DuplicateBehaviour";
+	public static final int DUP_ACCEPT_CONTINUE = 0;
+	public static final int DUP_ACCEPT_PAUSE = 1;
+	public static final int DUP_REJECT_CONTINUE = 2;
+	public static final int DUP_REJECT_PAUSE = 3;
+	
+	public static final String MIME_TYPE_DIR = "vnd.android.cursor.dir/net.madhouse.tixscan.list";
+	public static final String MIME_TYPE_ITEM = "vnd.android.cursor.item/net.madhouse.tixscan.list";
 	
 	private Constants() {}
 }

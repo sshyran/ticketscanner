@@ -17,18 +17,36 @@ package net.madhouse.tixscan;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 	
+	public static final class TicketTable implements BaseColumns {
+		private static final String DATABASE_NAME = "ticket_lists.db";
+		private static final int DATABASE_VERSION = 1;
+		public static final String TEXT = "text";
+		public static final String FIRST_SCAN = "first_scan";
+		public static final String SCAN_COUNT = "scan_count";
+		
+		private TicketTable() {}
+	}
+	
+	public static final int RESULT_OK = 0;
+	public static final int RESULT_DUPLICATE_TICKET = -1;
+	public static final int RESULT_UNKNOWN_TICKET = -2;
+	public static final int RESULT_SQL_FAIL = -3;
+	public static final int RESULT_LIST_EXISTS = -4;
+	public static final int RESULT_BAD_LIST_NAME = -5;
+	
 	public DatabaseHelper(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		super(context, TicketTable.DATABASE_NAME, null, TicketTable.DATABASE_VERSION);
 	}
 
 	public int getListCount() {
@@ -36,37 +54,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	public String[] getLists() {
+		if (mTableNames == null)
+			getReadableDatabase();
+		
 		String[] ret = new String[mTableNames.size()];
 		mTableNames.toArray(ret);
 		Arrays.sort(ret, String.CASE_INSENSITIVE_ORDER);
 		return ret;
 	}
 	
-	public boolean createTable(String name, String[] tickets) {
+	public int createTable(String name, String[] tickets) {
+		if (mTableNames == null)
+			getWritableDatabase();
+		
 		if (mTableNames.contains(name))
-			return true;
+			return RESULT_LIST_EXISTS;
 		if (!name.matches("[a-zA-Z0-9_]+"))
-			return false;
+			return RESULT_BAD_LIST_NAME;
 		
 		SQLiteDatabase db = getWritableDatabase();
 		try {
 			db.execSQL("CREATE TABLE ? (" +
-					Constants.TicketTable._ID + " INTEGER PRIMARY KEY," +
-					Constants.TicketTable.TEXT + " TEXT," +
-					Constants.TicketTable.FIRST_SCAN + " INTEGER," + 
-					Constants.TicketTable.SCAN_COUNT + " INTEGER" + 
+					TicketTable._ID + " INTEGER PRIMARY KEY," +
+					TicketTable.TEXT + " TEXT," +
+					TicketTable.FIRST_SCAN + " INTEGER," + 
+					TicketTable.SCAN_COUNT + " INTEGER" + 
 					");", new Object[] { name } );
 		} catch (SQLException e) {
-			return false;
+			return RESULT_SQL_FAIL;
 		}
 		mTableNames.add(name);
 		
 		for (String s : tickets) {
 			try {
 				db.execSQL("INSERT INTO ? (" +
-						Constants.TicketTable.TEXT + "," +
-						Constants.TicketTable.FIRST_SCAN + "," +
-						Constants.TicketTable.SCAN_COUNT +
+						TicketTable.TEXT + "," +
+						TicketTable.FIRST_SCAN + "," +
+						TicketTable.SCAN_COUNT +
 						") VALUES (?,NULL,0)"
 						, new Object[] { name, s } );
 			} catch (SQLException e) {
@@ -74,7 +98,75 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			}
 		}
 		
-		return true;
+		return RESULT_OK;
+	}
+	
+	private static final String[] COLS_JUST_IDS = { TicketTable._ID };
+	private static final String[] COLS_JUST_COUNTS = { TicketTable.SCAN_COUNT };
+	private static final String SELECT_SCANNED = TicketTable.SCAN_COUNT + ">0";
+	private static final String SELECT_DUPE = TicketTable.SCAN_COUNT + ">1";
+	private static final String SELECT_ONE = TicketTable.TEXT+"=?";
+	
+	public int getTotalCount(String tableName) {
+		int count;
+		try {
+			SQLiteDatabase db = getReadableDatabase();
+			Cursor c = db.query(tableName, COLS_JUST_IDS, null, null, null, null, null);
+			count = c.getCount();
+			c.close();
+		} catch (SQLException e) {
+			return 0;
+		}
+		return count;
+	}
+	
+	public int getScannedCount(String tableName) {
+		int count;
+		try {
+			SQLiteDatabase db = getReadableDatabase();
+			Cursor c = db.query(tableName, COLS_JUST_IDS, SELECT_SCANNED, null, null, null, null);
+			count = c.getCount();
+			c.close();
+		} catch(SQLException e) {
+			return 0;
+		}
+		return count;
+	}
+	
+	public int getDuplicateCount(String tableName) {
+		int count = 0;
+		try {
+			SQLiteDatabase db = getReadableDatabase();
+			Cursor c = db.query(tableName, COLS_JUST_COUNTS, SELECT_DUPE, null, null, null, null);
+			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				count += c.getInt(0) - 1;
+			}
+			c.close();
+		} catch(SQLException e) {
+			return count;
+		}
+		return count;
+	}
+	
+	public int getScanResult(String tableName, String key) {
+		try {
+			SQLiteDatabase db = getWritableDatabase();
+			Cursor c = db.query(tableName, COLS_JUST_COUNTS, SELECT_ONE, new String[]{tableName}, null, null, null);
+			if (c.getCount() == 0) {
+				c.close();
+				return RESULT_UNKNOWN_TICKET;
+			}
+			int count = c.getInt(0);
+			c.close();
+			if (count == 0) {
+				// TODO: Update row in table with single count and date
+				return RESULT_OK;
+			}
+			// TODO: Update row in table with incremented count
+			return RESULT_DUPLICATE_TICKET;
+		} catch(SQLException e) {
+			return RESULT_SQL_FAIL;
+		}
 	}
 
 	@Override
@@ -96,7 +188,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	private TreeSet<String> mTableNames;
-	
-	private static final String DATABASE_NAME = "ticket_lists.db";
-	private static final int DATABASE_VERSION = 1;
 }

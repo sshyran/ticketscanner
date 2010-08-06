@@ -17,4 +17,23 @@
 <resources>
     <string name="hello">Hello World, MainEntryActivity!</string>
     <string name="app_name">Ticket Scanner</string>
+    <string name="import_list">Import a new list</string>
+    <string name="reading_existing">Reading existing lists...</string>
+    <string name="no_name">(no name)</string>
+    <string name="last_scanned">Last scanned:</string>
+    <string name="tickets_scanned">Tickets scanned:</string>
+    <string name="tickets_in_list">Tickets in list:</string>
+    <string name="duplicates">Duplicates:</string>
+    <string name="url_label">Address of list to import:</string>
+    <string name="url_hint">URL to CSV file</string>
+    <string name="name_label">Name for imported list:</string>
+    <string name="name_hint">Name</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="downloading">Downloading...</string>
+    <string name="updating_db">Updating database...</string>
+    <string name="fail_list_exists">There is already a list with that name.</string>
+    <string name="fail_bad_list_name">For now, we don\'t support lists with complex names.</string>
+    <string name="fail_sql_error">A SQL error occurred.</string>
+    
 </resources>

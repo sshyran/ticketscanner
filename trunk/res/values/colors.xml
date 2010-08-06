@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!-- 
    Copyright 2010 Brian C. Young and contributors
    
@@ -14,14 +13,6 @@
    See the License for the specific language governing permissions and 
    limitations under the License. 
       -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
-</LinearLayout>
+<resources><color name="yellow_bg">#333300</color>
+<color name="red_bg">#330000</color>
+</resources>

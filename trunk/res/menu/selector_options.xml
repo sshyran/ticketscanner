@@ -17,9 +17,13 @@
 	<item android:title="Default Duplicate Behavior" android:id="@+id/menuitem_dupe_default">
 		<menu>
 			<group android:checkableBehavior="single">
-				<item android:id="@+id/menuitem_dupe_default_reject"
+				<item android:id="@+id/menuitem_dupe_default_reject_pause"
 					android:title="Reject ticket" ></item>
-				<item android:id="@+id/menuitem_dupe_default_accept"
+				<item android:id="@+id/menuitem_dupe_default_accept_pause"
+					android:title="Accept ticket" ></item>
+				<item android:id="@+id/menuitem_dupe_default_reject_continue"
+					android:title="Reject ticket" ></item>
+				<item android:id="@+id/menuitem_dupe_default_accept_continue"
 					android:title="Accept ticket" ></item>
 			</group>
 		</menu>

@@ -18,12 +18,17 @@ package net.madhouse.tixscan;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
-public class ListSelectorActivity extends Activity implements View.OnClickListener {
+public class ListSelectorActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 	
 	private static final int REQUEST_CODE_IMPORT_NEW = 1;
 	
@@ -35,6 +40,36 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
         
         View v = findViewById(R.id.selector_btn_import);
         v.setOnClickListener(this);
+        
+        ListView list = (ListView)findViewById(R.id.selector_list);
+        list.setOnItemSelectedListener(this);
+        new Thread(new ListReadRunnable()).start();
+    }
+    
+    private class ListReadRunnable implements Runnable {
+
+		public ListReadRunnable() {
+			// do nothing
+		}
+
+		@Override
+		public void run() {
+			DatabaseHelper helper = new DatabaseHelper(ListSelectorActivity.this);
+			final String[] lists = helper.getLists();
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					ArrayAdapter adapter = new ArrayAdapter<String>(ListSelectorActivity.this, R.layout.list_line, lists);
+					ListView view = (ListView) findViewById(R.id.selector_list);
+					view.setAdapter(adapter);
+					
+					View progress = findViewById(R.id.selector_populating);
+					progress.setVisibility(View.GONE);
+				}
+				
+			});
+		}
     }
 
 	/* (non-Javadoc)
@@ -63,7 +98,7 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
 		switch (v.getId()) {
 		case R.id.selector_btn_import:
 			intent = new Intent(Intent.ACTION_INSERT);
-			intent.setType("vnd.android.cursor.dir/net.madhouse.tixscan.list");
+			intent.setType(Constants.MIME_TYPE_DIR);
 			startActivityForResult(intent, REQUEST_CODE_IMPORT_NEW);
 			break;
 		}
@@ -82,12 +117,17 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
 		item.setIntent(launchAbout);
 		
 		SharedPreferences prefs = getSharedPreferences(Constants.PREFS_FILE, 0);
-		boolean acceptByDef = prefs.getBoolean(Constants.PREF_ACCEPT_BY_DEFAULT, false);
-		
-		if (acceptByDef)
-			item = menu.findItem(R.id.menuitem_dupe_default_accept);
-		else 
-			item = menu.findItem(R.id.menuitem_dupe_default_reject);
+		int dupBehave = prefs.getInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_REJECT_CONTINUE);
+		switch (dupBehave) {
+		case Constants.DUP_ACCEPT_CONTINUE:
+			item = menu.findItem(R.id.menuitem_dupe_default_accept_continue); break;
+		case Constants.DUP_ACCEPT_PAUSE:
+			item = menu.findItem(R.id.menuitem_dupe_default_accept_pause); break;
+		case Constants.DUP_REJECT_CONTINUE:
+			item = menu.findItem(R.id.menuitem_dupe_default_reject_continue); break;
+		case Constants.DUP_REJECT_PAUSE:
+			item = menu.findItem(R.id.menuitem_dupe_default_reject_pause); break;
+		}
 		item.setChecked(true);
 		
 		return true;
@@ -102,17 +142,43 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
 		SharedPreferences.Editor editor;
 		int id = item.getItemId();
 		switch (id) {
-		case R.id.menuitem_dupe_default_accept:
-		case R.id.menuitem_dupe_default_reject:
+		case R.id.menuitem_dupe_default_accept_pause:
 			editor = prefs.edit();
-			editor.putBoolean(Constants.PREF_ACCEPT_BY_DEFAULT, 
-					id == R.id.menuitem_dupe_default_accept);
+			editor.putInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_ACCEPT_PAUSE);
 			editor.commit();
-			item.setChecked(true);
 			break;
-		default:
-			return false;
+		case R.id.menuitem_dupe_default_reject_pause:
+			editor = prefs.edit();
+			editor.putInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_REJECT_PAUSE);
+			editor.commit();
+			break;
+		case R.id.menuitem_dupe_default_accept_continue:
+			editor = prefs.edit();
+			editor.putInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_ACCEPT_CONTINUE);
+			editor.commit();
+			break;
+		case R.id.menuitem_dupe_default_reject_continue:
+			editor = prefs.edit();
+			editor.putInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_REJECT_CONTINUE);
+			editor.commit();
+			break;
 		}
-		return false;
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onItemSelected(AdapterView<?> list, View text, int position,
+			long id) {
+		TextView t = (TextView) text;
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		Uri.Builder builder = new Uri.Builder();
+		builder.path(t.getText().toString());
+		intent.setDataAndType(builder.build(), Constants.MIME_TYPE_ITEM);
+		startActivity(intent);
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+		// Ok to do nothing.
 	}
 }
