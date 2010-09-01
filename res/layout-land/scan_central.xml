@@ -41,7 +41,7 @@
 			android:layout_width="fill_parent" android:gravity="center"
 			android:hint="0"></TextView>
 	</LinearLayout>
-	<ImageButton android:layout_height="fill_parent"
+	<Button android:layout_height="fill_parent"
 		android:layout_alignParentRight="true" android:layout_width="fill_parent"
-		android:id="@+id/scan_btn_scan"></ImageButton>
+		android:id="@+id/scan_btn_scan"></Button>
 </LinearLayout>

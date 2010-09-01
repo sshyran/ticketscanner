@@ -28,7 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class ListSelectorActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class ListSelectorActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
 	
 	private static final int REQUEST_CODE_IMPORT_NEW = 1;
 	
@@ -42,7 +42,7 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
         v.setOnClickListener(this);
         
         ListView list = (ListView)findViewById(R.id.selector_list);
-        list.setOnItemSelectedListener(this);
+        list.setOnItemClickListener(this);
         new Thread(new ListReadRunnable()).start();
     }
     
@@ -85,7 +85,7 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
 		switch (requestCode) {
 		case REQUEST_CODE_IMPORT_NEW:
 			intent = new Intent(Intent.ACTION_EDIT);
-			intent.setData(data.getData());
+			intent.setDataAndType(data.getData(), data.getType());
 			startActivity(intent);
 			break;
 		}
@@ -167,18 +167,12 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
 	}
 
 	@Override
-	public void onItemSelected(AdapterView<?> list, View text, int position,
-			long id) {
+	public void onItemClick(AdapterView<?> list, View text, int position, long id) {
 		TextView t = (TextView) text;
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		Uri.Builder builder = new Uri.Builder();
 		builder.path(t.getText().toString());
 		intent.setDataAndType(builder.build(), Constants.MIME_TYPE_ITEM);
 		startActivity(intent);
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> arg0) {
-		// Ok to do nothing.
 	}
 }

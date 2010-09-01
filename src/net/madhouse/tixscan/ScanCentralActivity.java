@@ -25,6 +25,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class ScanCentralActivity extends Activity implements View.OnClickListener {
+	
+	private TextView mLabelLastScanned;
+	private TextView mLabelScanCount;
+	private TextView mLabelTotalCount;
+	private TextView mLabelDuplicateCount;
+	
+	private static final String KEY_LAST_SCANNED = "last_scanned";
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,21 +45,35 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
         mTableName = data.getEncodedPath();
         
         // TODO: Push these out to a work thread
-        TextView t = (TextView)findViewById(R.id.scan_text_count);
+        mLabelScanCount = (TextView)findViewById(R.id.scan_text_count);
         mScanCount = mHelper.getScannedCount(mTableName);
-        t.setText(Integer.toString(mScanCount));
+        mLabelScanCount.setText(Integer.toString(mScanCount));
         
-        t = (TextView)findViewById(R.id.scan_text_total);
-        t.setText(Integer.toString(mHelper.getTotalCount(mTableName)));
+        mLabelTotalCount = (TextView)findViewById(R.id.scan_text_total);
+        mLabelTotalCount.setText(Integer.toString(mHelper.getTotalCount(mTableName)));
         
-        t = (TextView)findViewById(R.id.scan_text_dupes);
-        t.setText(Integer.toString(mHelper.getDuplicateCount(mTableName)));
+        mLabelDuplicateCount = (TextView)findViewById(R.id.scan_text_dupes);
+        mLabelDuplicateCount.setText(Integer.toString(mHelper.getDuplicateCount(mTableName)));
+        
+        mLabelLastScanned = (TextView)findViewById(R.id.scan_text_last);
+        if (savedInstanceState != null) {
+        	mLabelLastScanned.setText(savedInstanceState.getString(KEY_LAST_SCANNED));
+        }
         
         Button b = (Button)findViewById(R.id.scan_btn_scan);
         b.setOnClickListener(this);
     }
 
     /* (non-Javadoc)
+	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+	 */
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString(KEY_LAST_SCANNED, mLabelLastScanned.getText().toString());
+	}
+
+	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
 	 */
 	@Override
@@ -84,19 +106,17 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// Assuming that the scanner is the only thing we start for results
 		View bg = findViewById(R.id.scan_layout_root);
-		TextView last = (TextView)findViewById(R.id.scan_text_last);
 		if (resultCode == RESULT_CANCELED) {
 			bg.setBackgroundColor(android.R.color.black);
-			last.setText("");
+			mLabelLastScanned.setText("");
 			return;
 		}
-		String result = data.getDataString();
-		last.setText(result);
+		String result = data.getStringExtra("SCAN_RESULT");
+		mLabelLastScanned.setText(result);
 		switch (mHelper.getScanResult(mTableName, result)) {
 		case DatabaseHelper.RESULT_OK:
 			bg.setBackgroundColor(android.R.color.black);
-			TextView count = (TextView)findViewById(R.id.scan_text_count);
-			count.setText(Integer.toString(++mScanCount));
+			mLabelScanCount.setText(Integer.toString(++mScanCount));
 			// TODO: Delay and then restart scanner
 			break;
 		case DatabaseHelper.RESULT_DUPLICATE_TICKET:
