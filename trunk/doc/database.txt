@@ -6,4 +6,4 @@ text TEXT
 first_scan INTEGER (Java gives times as long, no need to translate to DATETIME)
 scan_count INTEGER
 
-These columns are stored in Constants.TicketTable.
+These columns are stored in DatabaseHelper.TicketTable.

@@ -114,7 +114,7 @@ public class ListImporterActivity extends Activity implements View.OnClickListen
 				setProgress(R.string.fail_bad_list_name, false);
 				break;
 			case DatabaseHelper.RESULT_SQL_FAIL:
-				setProgress(R.string.fail_sql_error);
+				setProgress(R.string.fail_sql_error, false);
 				break;
 			}
 		}

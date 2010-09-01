@@ -51,9 +51,9 @@
 				android:gravity="left" android:layout_marginLeft="2pt"></TextView>
 		</TableRow>
 	</TableLayout>
-	<ImageButton android:layout_height="fill_parent"
+	<Button android:layout_height="fill_parent"
 		android:layout_alignParentRight="true" android:layout_width="fill_parent"
-		android:id="@+id/scan_btn_scan"></ImageButton>
+		android:id="@+id/scan_btn_scan"></Button>
 
 
 </LinearLayout>
