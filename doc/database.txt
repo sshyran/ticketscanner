@@ -1,9 +1,17 @@
-The database design for this app doesn't need to be very complicated.  Each
-list of tickets will be its own table, referenced by name. Columns will be:
+The database design for this app doesn't need to be very complicated.
+
+Lists of tickets are stored in 'tables'. Columns are:
+_id INTEGER_PRIMARY KEY
+name TEXT
+
+These columns are stored in DatabaseHelper.MetaTable.
+
+Individual tickets are stored in 'tickets'. Columns are:
 
 _id INTEGER PRIMARY KEY
 text TEXT
 first_scan INTEGER (Java gives times as long, no need to translate to DATETIME)
 scan_count INTEGER
+table_id INTEGER FOREIGN KEY references tables(_ID)
 
 These columns are stored in DatabaseHelper.TicketTable.

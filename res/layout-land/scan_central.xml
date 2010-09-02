@@ -43,5 +43,5 @@
 	</LinearLayout>
 	<Button android:layout_height="fill_parent"
 		android:layout_alignParentRight="true" android:layout_width="fill_parent"
-		android:id="@+id/scan_btn_scan"></Button>
+		android:id="@+id/scan_btn_scan" android:text="@string/scan" android:textSize="20pt"></Button>
 </LinearLayout>

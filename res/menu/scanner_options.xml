@@ -14,11 +14,17 @@
    limitations under the License. 
       -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:title="Email List Status" android:id="@+id/menuitem_email"></item>
-	<item android:title="Clear List" android:id="@+id/menuitem_clear">
+	<item android:title="@string/email_list" android:id="@+id/menuitem_email"></item>
+	<item android:title="@string/clear_list" android:id="@+id/menuitem_clear">
 		<menu>
-			<item android:title="Confirm" android:id="@+id/menuitem_clear_confirm"></item>
-			<item android:title="Cancel"></item>
+			<item android:title="@string/ok" android:id="@+id/menuitem_clear_confirm"></item>
+			<item android:title="@string/cancel"></item>
+		</menu>
+	</item>
+	<item android:title="@string/delete_list" android:id="@+id/menuitem_delete">
+		<menu>
+			<item android:title="@string/ok" android:id="@+id/menuitem_delete_confirm"></item>
+			<item android:title="@string/cancel"></item>
 		</menu>
 	</item>
 </menu>

@@ -91,22 +91,13 @@ public class ListImporterActivity extends Activity implements View.OnClickListen
 					"To My Valentine"
 			};
 			TextView nameentry = (TextView)findViewById(R.id.import_edit_name);
-			String name = nameentry.getText().toString();
+			String name = nameentry.getText().toString().trim();
 			DatabaseHelper helper = new DatabaseHelper(ListImporterActivity.this);
 			
 			setProgress(R.string.updating_db, true);
 			int result = helper.createTable(name, titles);
 			
 			switch (result) {
-			case DatabaseHelper.RESULT_OK:
-				// TODO: Does this need to be on the UI thread?
-				Uri.Builder builder = new Uri.Builder();
-				builder.path(name);
-				Intent ret = new Intent();
-				ret.setDataAndType(builder.build(), Constants.MIME_TYPE_ITEM);
-				setResult(RESULT_OK, ret);
-				finish();
-				break;
 			case DatabaseHelper.RESULT_LIST_EXISTS:
 				setProgress(R.string.fail_list_exists, false);
 				break;
@@ -115,6 +106,15 @@ public class ListImporterActivity extends Activity implements View.OnClickListen
 				break;
 			case DatabaseHelper.RESULT_SQL_FAIL:
 				setProgress(R.string.fail_sql_error, false);
+				break;
+			default:
+				// TODO: Does this need to be on the UI thread?
+				Uri.Builder builder = new Uri.Builder();
+				builder.path(Integer.toString(result));
+				Intent ret = new Intent();
+				ret.setDataAndType(builder.build(), Constants.MIME_TYPE_ITEM);
+				setResult(RESULT_OK, ret);
+				finish();
 				break;
 			}
 		}

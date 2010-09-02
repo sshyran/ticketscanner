@@ -19,14 +19,18 @@ package net.madhouse.tixscan;
 public final class Constants {
 	public static final String PREFS_FILE = "TixScanPrefs";
 	
-	public static final String PREF_DUPLICATE_BEHAVIOUR = "DuplicateBehaviour";
-	public static final int DUP_ACCEPT_CONTINUE = 0;
-	public static final int DUP_ACCEPT_PAUSE = 1;
-	public static final int DUP_REJECT_CONTINUE = 2;
-	public static final int DUP_REJECT_PAUSE = 3;
+	public static final String PREF_DELAY_OK = "DelayOk";
+	public static final String PREF_DELAY_DUPLICATE = "DelayDupe";
+	public static final String PREF_DELAY_NOTFOUND = "DelayFailed";
+	
+	public static final int DEFAULT_DELAY_OK = 500;
+	public static final int DEFAULT_DELAY_DUPLICATE = 2000;
+	public static final int DEFAULT_DELAY_NOTFOUND = -1;
 	
 	public static final String MIME_TYPE_DIR = "vnd.android.cursor.dir/net.madhouse.tixscan.list";
 	public static final String MIME_TYPE_ITEM = "vnd.android.cursor.item/net.madhouse.tixscan.list";
+
+	public final static String LOG_TAG = "Ticket Scanner";
 	
 	private Constants() {}
 }
