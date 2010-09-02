@@ -15,4 +15,5 @@
       -->
 <TextView android:layout_height="wrap_content" 
 xmlns:android="http://schemas.android.com/apk/res/android" 
-android:hint="@string/no_name" android:layout_margin="3pt" android:padding="6pt" android:layout_width="fill_parent"></TextView>
+android:hint="@string/no_name" android:layout_margin="3pt" 
+android:padding="6pt" android:layout_width="fill_parent" android:id="@+id/item_line_name"></TextView>

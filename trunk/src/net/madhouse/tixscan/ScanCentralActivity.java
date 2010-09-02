@@ -17,6 +17,7 @@ package net.madhouse.tixscan;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -42,18 +43,22 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
         
         Intent intent = getIntent();
         Uri data = intent.getData();
-        mTableName = data.getEncodedPath();
+        mTableId = Integer.parseInt(data.getEncodedPath());
         
         // TODO: Push these out to a work thread
         mLabelScanCount = (TextView)findViewById(R.id.scan_text_count);
-        mScanCount = mHelper.getScannedCount(mTableName);
-        mLabelScanCount.setText(Integer.toString(mScanCount));
+        mScannedCursor = mHelper.getScannedTicketCursor(mTableId);
+        startManagingCursor(mScannedCursor);
         
         mLabelTotalCount = (TextView)findViewById(R.id.scan_text_total);
-        mLabelTotalCount.setText(Integer.toString(mHelper.getTotalCount(mTableName)));
+        mAllCursor = mHelper.getAllTicketCursor(mTableId);
+        startManagingCursor(mAllCursor);
         
         mLabelDuplicateCount = (TextView)findViewById(R.id.scan_text_dupes);
-        mLabelDuplicateCount.setText(Integer.toString(mHelper.getDuplicateCount(mTableName)));
+        mDuplicateCursor = mHelper.getDuplicateTicketCursor(mTableId);
+        startManagingCursor(mDuplicateCursor);
+        
+        refreshLabelCounts(false);
         
         mLabelLastScanned = (TextView)findViewById(R.id.scan_text_last);
         if (savedInstanceState != null) {
@@ -64,7 +69,18 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
         b.setOnClickListener(this);
     }
 
-    /* (non-Javadoc)
+	protected void refreshLabelCounts(boolean requery) {
+		if (requery) {
+			mScannedCursor.requery();
+	        mAllCursor.requery();
+	        mDuplicateCursor.requery();
+		}
+        mLabelScanCount.setText(Integer.toString(mScannedCursor.getCount()));
+        mLabelTotalCount.setText(Integer.toString(mAllCursor.getCount()));
+        mLabelDuplicateCount.setText(Integer.toString(mDuplicateCursor.getCount()));
+	}
+
+	/* (non-Javadoc)
 	 * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
 	 */
 	@Override
@@ -82,9 +98,13 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
 		return true;
 	}
 	
-	private String mTableName;
+	private int mTableId;
 	private DatabaseHelper mHelper;
-	private int mScanCount;
+	
+	private Cursor mScannedCursor;
+	private Cursor mAllCursor;
+	private Cursor mDuplicateCursor;
+	
 	private static final int REQUEST_CODE_SCAN = 0;
 	
 	private void triggerScan() {
@@ -111,12 +131,11 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
 			mLabelLastScanned.setText("");
 			return;
 		}
-		String result = data.getStringExtra("SCAN_RESULT");
-		mLabelLastScanned.setText(result);
-		switch (mHelper.getScanResult(mTableName, result)) {
+		String ticket = data.getStringExtra("SCAN_RESULT");
+		mLabelLastScanned.setText(ticket);
+		switch (mHelper.getScanResult(mTableId, ticket)) {
 		case DatabaseHelper.RESULT_OK:
 			bg.setBackgroundColor(android.R.color.black);
-			mLabelScanCount.setText(Integer.toString(++mScanCount));
 			// TODO: Delay and then restart scanner
 			break;
 		case DatabaseHelper.RESULT_DUPLICATE_TICKET:
@@ -132,5 +151,7 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
 			// TODO: Popup database error message
 			break;
 		}
+		
+		refreshLabelCounts(true);
 	}
 }

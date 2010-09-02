@@ -17,20 +17,25 @@ package net.madhouse.tixscan;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class ListSelectorActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
 	
 	private static final int REQUEST_CODE_IMPORT_NEW = 1;
+	
+	private DatabaseHelper mHelper;
 	
     /** Called when the activity is first created. */
     @Override
@@ -43,33 +48,12 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
         
         ListView list = (ListView)findViewById(R.id.selector_list);
         list.setOnItemClickListener(this);
-        new Thread(new ListReadRunnable()).start();
-    }
-    
-    private class ListReadRunnable implements Runnable {
-
-		public ListReadRunnable() {
-			// do nothing
-		}
-
-		@Override
-		public void run() {
-			DatabaseHelper helper = new DatabaseHelper(ListSelectorActivity.this);
-			final String[] lists = helper.getLists();
-			runOnUiThread(new Runnable() {
-
-				@Override
-				public void run() {
-					ArrayAdapter adapter = new ArrayAdapter<String>(ListSelectorActivity.this, R.layout.list_line, lists);
-					ListView view = (ListView) findViewById(R.id.selector_list);
-					view.setAdapter(adapter);
-					
-					View progress = findViewById(R.id.selector_populating);
-					progress.setVisibility(View.GONE);
-				}
-				
-			});
-		}
+        registerForContextMenu(list);
+        mHelper = new DatabaseHelper(this);
+        Cursor c = mHelper.getTablesCursor();
+        startManagingCursor(c);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.list_line, c, DatabaseHelper.MetaTable.COLS_JUST_NAMES, new int[] { R.id.item_line_name });
+        list.setAdapter(adapter);
     }
 
 	/* (non-Javadoc)
@@ -88,6 +72,8 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
 			intent.setDataAndType(data.getData(), data.getType());
 			startActivity(intent);
 			break;
+		default:
+			Log.w(Constants.LOG_TAG, "Unhandled activity result: " + requestCode);
 		}
 	}
 
@@ -101,6 +87,8 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
 			intent.setType(Constants.MIME_TYPE_DIR);
 			startActivityForResult(intent, REQUEST_CODE_IMPORT_NEW);
 			break;
+		default:
+			Log.w(Constants.LOG_TAG, "Unhandled click from view: " + v);
 		}
 	}
 
@@ -116,21 +104,16 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
 		launchAbout.setClass(this, AboutActivity.class);
 		item.setIntent(launchAbout);
 		
-		SharedPreferences prefs = getSharedPreferences(Constants.PREFS_FILE, 0);
-		int dupBehave = prefs.getInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_REJECT_CONTINUE);
-		switch (dupBehave) {
-		case Constants.DUP_ACCEPT_CONTINUE:
-			item = menu.findItem(R.id.menuitem_dupe_default_accept_continue); break;
-		case Constants.DUP_ACCEPT_PAUSE:
-			item = menu.findItem(R.id.menuitem_dupe_default_accept_pause); break;
-		case Constants.DUP_REJECT_CONTINUE:
-			item = menu.findItem(R.id.menuitem_dupe_default_reject_continue); break;
-		case Constants.DUP_REJECT_PAUSE:
-			item = menu.findItem(R.id.menuitem_dupe_default_reject_pause); break;
-		}
-		item.setChecked(true);
-		
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreateContextMenu(android.view.ContextMenu, android.view.View, android.view.ContextMenu.ContextMenuInfo)
+	 */
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		getMenuInflater().inflate(R.menu.scanner_options, menu);
 	}
 
 	/* (non-Javadoc)
@@ -138,40 +121,35 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		SharedPreferences prefs = getSharedPreferences(Constants.PREFS_FILE, 0);
-		SharedPreferences.Editor editor;
 		int id = item.getItemId();
 		switch (id) {
-		case R.id.menuitem_dupe_default_accept_pause:
-			editor = prefs.edit();
-			editor.putInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_ACCEPT_PAUSE);
-			editor.commit();
-			break;
-		case R.id.menuitem_dupe_default_reject_pause:
-			editor = prefs.edit();
-			editor.putInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_REJECT_PAUSE);
-			editor.commit();
-			break;
-		case R.id.menuitem_dupe_default_accept_continue:
-			editor = prefs.edit();
-			editor.putInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_ACCEPT_CONTINUE);
-			editor.commit();
-			break;
-		case R.id.menuitem_dupe_default_reject_continue:
-			editor = prefs.edit();
-			editor.putInt(Constants.PREF_DUPLICATE_BEHAVIOUR, Constants.DUP_REJECT_CONTINUE);
-			editor.commit();
-			break;
+		case R.id.menuitem_about:
+			break; // Handled by setting an intent
+		default:
+			Log.w(Constants.LOG_TAG, "Unhandled options menu item: " + id);
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
+	 */
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		
+		switch (id) {
+		default:
+			Log.w(Constants.LOG_TAG, "Unhandled context menu item: " + id);
+		}
+		return super.onContextItemSelected(item);
+	}
+
 	@Override
 	public void onItemClick(AdapterView<?> list, View text, int position, long id) {
-		TextView t = (TextView) text;
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		Uri.Builder builder = new Uri.Builder();
-		builder.path(t.getText().toString());
+		builder.path(Long.toString(id));
 		intent.setDataAndType(builder.build(), Constants.MIME_TYPE_ITEM);
 		startActivity(intent);
 	}
