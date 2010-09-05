@@ -18,6 +18,7 @@ package net.madhouse.tixscan;
 import java.util.Arrays;
 import java.util.TreeSet;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -52,7 +53,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		public static final String[] COLS_JUST_IDS = { _ID };
 		public static final String[] COLS_JUST_COUNTS = { SCAN_COUNT };
+		public static final String[] COLS_IDS_AND_COUNTS = { _ID, SCAN_COUNT };
 		
+		public static final String SELECT_BY_ID = _ID+"=?";
 		public static final String SELECT_BY_TID = TABLE_ID+"=?";
 		public static final String SELECT_SCANNED_BY_TID = TABLE_ID+"=? AND " + SCAN_COUNT+">0";
 		public static final String SELECT_DUPE_BY_TID = TABLE_ID+"=? AND " + SCAN_COUNT+">1";
@@ -168,19 +171,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = null;
 		try {
 			SQLiteDatabase db = getWritableDatabase();
-			c = db.query(TicketTable.TABLE_NAME, TicketTable.COLS_JUST_COUNTS, 
+			c = db.query(TicketTable.TABLE_NAME, TicketTable.COLS_IDS_AND_COUNTS, 
 					TicketTable.SELECT_BY_TID_AND_TEXT, new String[]{ Integer.toString(tableId), key }, 
 					null, null, null);
 			if (c.getCount() == 0) {
 				return RESULT_UNKNOWN_TICKET;
 			}
 			c.moveToFirst();
-			int count = c.getInt(0);
+			int id = c.getInt(0);
+			int count = c.getInt(1);
+			Log.v(Constants.LOG_TAG, "scan for <" + key + "> with count " + count);
+			ContentValues values = new ContentValues();
+			values.put(TicketTable.SCAN_COUNT, count+1);
 			if (count == 0) {
-				// TODO: Update row in table with single count and date
+				values.put(TicketTable.FIRST_SCAN, System.currentTimeMillis());
+				Log.v(Constants.LOG_TAG, "count 0; trying update");
+				int rows = db.update(TicketTable.TABLE_NAME, values, TicketTable.SELECT_BY_ID, new String[] { Integer.toString(id) });
+				Log.v(Constants.LOG_TAG, "update success rows=" + rows);
 				return RESULT_OK;
 			}
-			// TODO: Update row in table with incremented count
+			Log.v(Constants.LOG_TAG, "count >= 1; trying update");
+			int rows = db.update(TicketTable.TABLE_NAME, values, TicketTable.SELECT_BY_ID, new String[] { Integer.toString(id) });
+			Log.v(Constants.LOG_TAG, "update success rows=" + rows);
 			return RESULT_DUPLICATE_TICKET;
 		} catch(SQLException e) {
 			e.printStackTrace();

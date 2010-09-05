@@ -13,6 +13,6 @@
    See the License for the specific language governing permissions and 
    limitations under the License. 
       -->
-<resources><color name="yellow_bg">#333300</color>
-<color name="red_bg">#330000</color>
+<resources><color name="yellow_bg">#33ffff00</color>
+<color name="red_bg">#33ff0000</color>
 </resources>
