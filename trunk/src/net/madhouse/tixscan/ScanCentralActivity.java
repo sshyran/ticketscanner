@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -45,7 +46,6 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
         Uri data = intent.getData();
         mTableId = Integer.parseInt(data.getEncodedPath());
         
-        // TODO: Push these out to a work thread
         mLabelScanCount = (TextView)findViewById(R.id.scan_text_count);
         mScannedCursor = mHelper.getScannedTicketCursor(mTableId);
         startManagingCursor(mScannedCursor);
@@ -98,6 +98,15 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onDestroy()
+	 */
+	@Override
+	protected void onDestroy() {
+		mHelper.close();
+		super.onDestroy();
+	}
+
 	private int mTableId;
 	private DatabaseHelper mHelper;
 	
@@ -127,7 +136,7 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
 		// Assuming that the scanner is the only thing we start for results
 		View bg = findViewById(R.id.scan_layout_root);
 		if (resultCode == RESULT_CANCELED) {
-			bg.setBackgroundColor(android.R.color.black);
+			bg.setBackgroundColor(getResources().getColor(android.R.color.black));
 			mLabelLastScanned.setText("");
 			return;
 		}
@@ -135,16 +144,16 @@ public class ScanCentralActivity extends Activity implements View.OnClickListene
 		mLabelLastScanned.setText(ticket);
 		switch (mHelper.getScanResult(mTableId, ticket)) {
 		case DatabaseHelper.RESULT_OK:
-			bg.setBackgroundColor(android.R.color.black);
+			bg.setBackgroundColor(getResources().getColor(android.R.color.black));
 			// TODO: Delay and then restart scanner
 			break;
 		case DatabaseHelper.RESULT_DUPLICATE_TICKET:
-			bg.setBackgroundColor(R.color.yellow_bg);
+			bg.setBackgroundColor(getResources().getColor(R.color.yellow_bg));
 			// TODO: Check pref, delay and restart scanner
 			
 			break;
 		case DatabaseHelper.RESULT_UNKNOWN_TICKET:
-			bg.setBackgroundColor(R.color.red_bg);
+			bg.setBackgroundColor(getResources().getColor(R.color.red_bg));
 			// TODO: Check pref, delay and restart scanner
 			break;
 		case DatabaseHelper.RESULT_SQL_FAIL:

@@ -117,6 +117,7 @@ public class ListImporterActivity extends Activity implements View.OnClickListen
 				finish();
 				break;
 			}
+			helper.close();
 		}
 	}
 	

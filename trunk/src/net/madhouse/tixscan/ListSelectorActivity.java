@@ -57,6 +57,15 @@ public class ListSelectorActivity extends Activity implements View.OnClickListen
     }
 
 	/* (non-Javadoc)
+	 * @see android.app.Activity#onDestroy()
+	 */
+	@Override
+	protected void onDestroy() {
+		mHelper.close();
+		super.onDestroy();
+	}
+
+	/* (non-Javadoc)
 	 * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
 	 */
 	@Override

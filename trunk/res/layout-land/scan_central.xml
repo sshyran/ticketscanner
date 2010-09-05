@@ -7,9 +7,11 @@
 	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 	the specific language governing permissions and limitations under the License. -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="fill_parent"
+	android:layout_width="fill_parent">
+<LinearLayout
 	android:orientation="horizontal" android:layout_height="fill_parent"
-	android:layout_width="fill_parent" android:id="@+id/scan_layout_root">
+	android:layout_width="fill_parent">
 	<LinearLayout android:layout_width="wrap_content"
 		android:layout_height="fill_parent" android:orientation="vertical">
 		<TextView android:layout_height="wrap_content"
@@ -45,3 +47,5 @@
 		android:layout_alignParentRight="true" android:layout_width="fill_parent"
 		android:id="@+id/scan_btn_scan" android:text="@string/scan" android:textSize="20pt"></Button>
 </LinearLayout>
+<FrameLayout android:layout_width="fill_parent" android:layout_height="fill_parent"  android:id="@+id/scan_layout_root"></FrameLayout>
+</FrameLayout>
